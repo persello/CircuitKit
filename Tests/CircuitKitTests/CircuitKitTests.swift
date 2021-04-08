@@ -6,7 +6,7 @@ final class CircuitKitTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(CircuitKit().text, "Hello, World!")
+//        XCTAssertEqual(CircuitKit().text, "Hello, World!")
     }
 
     static var allTests = [
