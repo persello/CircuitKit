@@ -1,7 +1,7 @@
 import Foundation
 
 // TODO: Implement multiplication and division with this type with automatic frequency capture.
-typealias ComputableImpedance = (Measurement<UnitFrequency>) -> Impedance
+public typealias ComputableImpedance = (Measurement<UnitFrequency>) -> Impedance
 
 // MARK: - Protocol
 
@@ -55,4 +55,24 @@ public final class Inductor: Bipole, LinearComponent {
 
     public var inductance: Measurement<UnitInductance>
     public var impedance: (Measurement<UnitFrequency>) -> Impedance
+}
+
+// MARK: - Operations with computable impedance
+// V = I * Z
+// V = Z * I
+extension Current {
+    public static func * (_ lhs: Current, _ rhs: ComputableImpedance) -> Voltage {
+        return lhs * rhs(lhs.omega)
+    }
+
+    public static func * (_ lhs: ComputableImpedance, _ rhs: Current) -> Voltage {
+        return rhs * lhs
+    }
+}
+
+// I = V / Z
+extension Voltage {
+    public static func / (_ lhs: Voltage, _ rhs: ComputableImpedance) -> Current {
+        lhs / rhs(lhs.omega)
+    }
 }
