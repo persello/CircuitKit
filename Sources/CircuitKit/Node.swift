@@ -8,13 +8,13 @@ public final class Node: Identifiable {
     }
 
     public var name: String?
-    public var voltage: Measurement<UnitElectricPotentialDifference>?
+    public var voltage: Voltage?
     public var connections: [(Bipole, Bipole.Pin)]
     public var id: UUID
 
     static var ground: Node {
         let node = Node("GND")
-        node.voltage = Measurement(value: 0, unit: .volts)
+        node.voltage = Voltage(peak: 0.volts, phase: 0.radians, omega: 0.radiansPerSecond)
         return node
     }
 }

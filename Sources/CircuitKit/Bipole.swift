@@ -9,6 +9,10 @@ public class Bipole: Identifiable {
     public init(nodeA: Node? = nil, nodeB: Node? = nil) {
         self.nodeA = nodeA ?? Node()
         self.nodeB = nodeB ?? Node()
+        
+        // willSet first init fix
+        self.nodeA.connections.append((self, .pinA))
+        self.nodeB.connections.append((self, .pinB))
     }
 
     public var nodeA: Node {
@@ -30,6 +34,8 @@ public class Bipole: Identifiable {
             newValue.connections.append((self, .pinB))
         }
     }
+    
+    public var current: Current?
 
     public var id = UUID()
 
