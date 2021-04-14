@@ -195,7 +195,7 @@ public final class Complex: CustomStringConvertible, Equatable {
 
     // CustomStringConvertible
     public var description: String {
-        return "\(String(format: "%.3f", real)) + \(String(format: "%.3f", imaginary))j, (mod: \(String(format: "%.3f", modulus)), arg: \(String(format: "%.3f", argument / .pi))π)"
+        return "\(String(format: "%.2f", real)) + \(String(format: "%.2f", imaginary))j"
     }
 
     // MARK: - Constants
@@ -224,4 +224,73 @@ extension Int {
     public var j: Complex {
         return Complex(real: 0, imaginary: Double(self))
     }
+}
+
+// MARK: - Complex matrix
+public final class Matrix<T>: CustomStringConvertible {
+    // Rows of columns
+    public var content: [[T]] = [[]]
+    
+    public var size: (Int, Int) {
+        // (rows, cols)
+        return (content.count, content.map({$0.count}).max() ?? 0)
+    }
+    
+    public func setItem(_ item: T, row: Int, col: Int) {
+        content[row][col] = item
+    }
+    
+    public var description: String {
+        var maxLen = 0
+        let descMatrix: [[String]] = content.map({ row in
+            row.map({ item in
+                let d: String = "\(item)"
+                maxLen = max(maxLen, d.count)
+                return d
+            })
+        })
+        
+        return descMatrix.map({ row in
+            row.map({ item in
+                item.padding(toLength: maxLen, withPad: " ", startingAt: item.count)
+            })
+        })
+        .reduce("", { res, item in
+            res + item.reduce("", { res, item in
+                res + item + " "
+            }) + "\n"
+        })
+    }
+}
+
+extension Matrix where T == Complex {
+    func getRealPart() -> Matrix<Double> {
+        let result = Matrix<Double>()
+        result.content = content.map({ row in
+            row.map({ item in
+                item.real
+            })
+        })
+        
+        return result
+    }
+    
+    func getImaginaryPart() -> Matrix<Double> {
+        let result = Matrix<Double>()
+        result.content = content.map({ row in
+            row.map({ item in
+                item.imaginary
+            })
+        })
+        
+        return result
+    }
+    
+//    func getComplexPart() -> Matrix<Double> {
+//        
+//    }
+    
+//    public var realMatrix {
+//
+//    }
 }
