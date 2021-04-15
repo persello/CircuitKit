@@ -25,6 +25,8 @@ final class CircuitTests: XCTestCase {
         
         XCTAssertEqual(circuit.nodes.count, 4)
         XCTAssertEqual(circuit.components.count, 8)
+        
+        print(circuit.buildGMatrix(omega: 0.hertz))
     }
 
     static var allTests = [
