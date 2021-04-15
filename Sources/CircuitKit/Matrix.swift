@@ -105,10 +105,9 @@ public final class Matrix<T>: CustomStringConvertible {
         
         for row in 0..<size.0 {
             for col in 0..<size.1 {
-                if let item = self[row, col] {
-                    descMatrix[row][col] = String(describing: unwrap(any: item))
-                    maxLen = max(maxLen, descMatrix[row][col].count)
-                }
+                let item = self[row, col]
+                descMatrix[row][col] = String(describing: unwrap(any: item as Any))
+                maxLen = max(maxLen, descMatrix[row][col].count)
             }
         }
         
@@ -168,48 +167,75 @@ extension Matrix: Equatable where T: Equatable {
 }
 
 // MARK: - Complex matrix
-extension Matrix where T == Complex {
-    func getRealPart() -> Matrix<Double> {
-        let result = Matrix<Double>()
+extension Matrix where T == Complex? {
+    func getRealPart() -> Matrix<Double?> {
+        let result = Matrix<Double?>()
         result.content = content.map({ row in
             row.map({ item in
-                item?.real
+                item??.real
             })
         })
         
         return result
     }
     
-    func getImaginaryPart() -> Matrix<Double> {
-        let result = Matrix<Double>()
+    func getImaginaryPart() -> Matrix<Double?> {
+        let result = Matrix<Double?>()
         result.content = content.map({ row in
             row.map({ item in
-                item?.imaginary
+                item??.imaginary
             })
         })
         
         return result
     }
     
-    public var realMatrixRepresentation: Matrix<Double> {
-        let submatrices = Matrix<Matrix<Double>>()
+    public var realMatrixRepresentation: Matrix<Double?> {
+        let submatrices = Matrix<Matrix<Double?>>()
         submatrices.content = [[getRealPart(), -getImaginaryPart()], [getImaginaryPart(), getRealPart()]]
         
-        return Matrix<Double>(fromMatrixOfMatrices: submatrices)
+        return Matrix<Double?>(fromMatrixOfMatrices: submatrices)
     }
     
-//    public convenience init(fromRealMatrixRepresentation realMatrix: Matrix<Double>) {
-//        
-//    }
+    public convenience init(fromRealMatrixRepresentation realMatrix: Matrix<Double?>) {
+        assert(realMatrix.size.0.isMultiple(of: 2))
+        assert(realMatrix.size.1.isMultiple(of: 2))
+        
+        self.init()
+        let finalSize = (realMatrix.size.0 / 2, realMatrix.size.1 / 2)
+        for row in 0..<finalSize.0 {
+            for col in 0..<finalSize.1 {
+                // Check real parts are equal
+                assert(realMatrix[row, col] == realMatrix[row + finalSize.0, col + finalSize.1])
+                
+                // Check complex parts are opposite
+                if realMatrix[row + finalSize.0, col] == nil || realMatrix[row, col + finalSize.1] == nil{
+                    assert(realMatrix[row + finalSize.0, col] == realMatrix[row, col + finalSize.1])
+                } else {
+                    assert((realMatrix[row + finalSize.0, col])! == -(realMatrix[row, col + finalSize.1]!!))
+                }
+                
+                let real: Double?? = realMatrix[row, col]
+                let imaginary: Double?? = realMatrix[row + finalSize.0, col]
+
+                if real == nil && imaginary == nil {
+                    self[row, col] = nil
+                } else {
+                    self[row, col] = Complex(real: (real ?? 0) ?? 0, imaginary: (imaginary ?? 0) ?? 0)
+                }
+            }
+        }
+    }
 }
 
-extension Matrix where T: AdditiveArithmetic {
+extension Matrix where T == Optional<Double> {
     public static prefix func - (_ rhs: Matrix<T>) -> Matrix<T> {
         let result = Matrix<T>()
         result.content = rhs.content.map({row in
             row.map({item in
                 if let i = item {
-                    return T.zero - i
+                    guard i != nil else { return nil }
+                    return 0 - i!
                 } else {
                     return nil
                 }
