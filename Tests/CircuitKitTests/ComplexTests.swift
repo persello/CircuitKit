@@ -37,7 +37,7 @@ final class ComplexTests: XCTestCase {
             
             let k = rand()
             
-            XCTAssertEqual(-x , .complexZero - x)
+            XCTAssertEqual(-x , .zero - x)
             
             XCTAssertEqual(x + y , Complex(real: x.real + y.real, imaginary: x.imaginary + y.imaginary))
             XCTAssertEqual(x - y , Complex(real: x.real - y.real, imaginary: x.imaginary - y.imaginary))

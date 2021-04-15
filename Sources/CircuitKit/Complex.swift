@@ -1,6 +1,7 @@
 import Foundation
 
-public final class Complex: CustomStringConvertible, Equatable {
+public final class Complex: AdditiveArithmetic, CustomStringConvertible, Equatable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
+    
     // MARK: - Internal representation
 
     private var _real: Double?
@@ -200,8 +201,18 @@ public final class Complex: CustomStringConvertible, Equatable {
 
     // MARK: - Constants
 
-    static let j = Complex(real: 0, imaginary: 1)
-    static let complexZero = Complex(real: 0, imaginary: 0)
+    public static let j = Complex(real: 0, imaginary: 1)
+    public static let zero = Complex(real: 0, imaginary: 0)
+    
+    // MARK: - Expressible by literal conformance
+    
+    public convenience init(integerLiteral value: Int) {
+        self.init(real: Double(value), imaginary: 0)
+    }
+    
+    public convenience init(floatLiteral value: Double) {
+        self.init(real: value, imaginary: 0)
+    }
 }
 
 
@@ -224,73 +235,4 @@ extension Int {
     public var j: Complex {
         return Complex(real: 0, imaginary: Double(self))
     }
-}
-
-// MARK: - Complex matrix
-public final class Matrix<T>: CustomStringConvertible {
-    // Rows of columns
-    public var content: [[T]] = [[]]
-    
-    public var size: (Int, Int) {
-        // (rows, cols)
-        return (content.count, content.map({$0.count}).max() ?? 0)
-    }
-    
-    public func setItem(_ item: T, row: Int, col: Int) {
-        content[row][col] = item
-    }
-    
-    public var description: String {
-        var maxLen = 0
-        let descMatrix: [[String]] = content.map({ row in
-            row.map({ item in
-                let d: String = "\(item)"
-                maxLen = max(maxLen, d.count)
-                return d
-            })
-        })
-        
-        return descMatrix.map({ row in
-            row.map({ item in
-                item.padding(toLength: maxLen, withPad: " ", startingAt: item.count)
-            })
-        })
-        .reduce("", { res, item in
-            res + item.reduce("", { res, item in
-                res + item + " "
-            }) + "\n"
-        })
-    }
-}
-
-extension Matrix where T == Complex {
-    func getRealPart() -> Matrix<Double> {
-        let result = Matrix<Double>()
-        result.content = content.map({ row in
-            row.map({ item in
-                item.real
-            })
-        })
-        
-        return result
-    }
-    
-    func getImaginaryPart() -> Matrix<Double> {
-        let result = Matrix<Double>()
-        result.content = content.map({ row in
-            row.map({ item in
-                item.imaginary
-            })
-        })
-        
-        return result
-    }
-    
-//    func getComplexPart() -> Matrix<Double> {
-//        
-//    }
-    
-//    public var realMatrix {
-//
-//    }
 }

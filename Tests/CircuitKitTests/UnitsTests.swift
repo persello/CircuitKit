@@ -12,8 +12,8 @@ final class UnitsTests: XCTestCase {
         let y = rand()
         let omega = rand().hertz
         
-        let c = rand() / 1_000_000
-        let l = rand() / 1_000
+        let c: Double = rand() / 1_000_000
+        let l: Double = rand() / 1_000
         
         
         let v0 = Voltage(rms: x.volts, phase: y.radians, omega: omega)

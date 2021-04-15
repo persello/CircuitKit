@@ -130,10 +130,10 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
                 return impedance.value
             } else {
                 print("You have defined a new serial/parallel unit without implementing its conversion!")
-                return .complexZero
+                return .zero
             }
         })
-            .reduce(.complexZero, { x, y in
+            .reduce(.zero, { x, y in
                 x + y
             })
 
@@ -148,10 +148,10 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
                 return impedance.value
             } else {
                 print("You have defined a new serial/parallel unit without implementing its conversion!")
-                return .complexZero
+                return .zero
             }
         })
-            .reduce(.complexZero, { x, y in
+            .reduce(.zero, { x, y in
                 if x == 0 {
                     return y
                 } else if y == 0 {
