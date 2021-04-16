@@ -36,6 +36,14 @@ public class Bipole: Identifiable {
     }
     
     public var current: Current?
+    public var voltage: Voltage? {
+        if let vA = nodeA.voltage,
+           let vB = nodeB.voltage {
+            return vA - vB
+        }
+        
+        return nil
+    }
 
     public var id = UUID()
 

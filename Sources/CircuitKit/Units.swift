@@ -32,7 +32,7 @@ public final class UnitCapacitance: Dimension {
 
 // MARK: - Voltage and current
 
-protocol Sinusoidal: CustomStringConvertible {
+protocol Sinusoidal: CustomStringConvertible, Equatable {
     var omega: Measurement<UnitFrequency> { get set }
     var value: Complex { get set }
 
@@ -41,6 +41,28 @@ protocol Sinusoidal: CustomStringConvertible {
 }
 
 extension Sinusoidal {
+    public static func - (_ lhs: Self, _ rhs: Self) -> Self {
+        var result = lhs
+        result.value = lhs.value - rhs.value
+        return result
+    }
+    
+    public static func + (_ lhs: Self, _ rhs: Self) -> Self {
+        var result = lhs
+        result.value = lhs.value + rhs.value
+        return result
+    }
+    
+    public static prefix func -(_ lhs: Self) -> Self {
+        var result = lhs
+        result.value = -lhs.value
+        return result
+    }
+    
+    public static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+        return (lhs.value == rhs.value && lhs.omega == rhs.omega)
+    }
+
     var phase: Measurement<UnitAngle> {
         return Measurement<UnitAngle>(value: value.argument, unit: .radians)
     }

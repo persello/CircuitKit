@@ -5,13 +5,13 @@ public typealias ComputableImpedance = (Measurement<UnitFrequency>) -> Impedance
 
 // MARK: - Protocol
 
-protocol LinearComponent {
+protocol ComponentWithComputableImpedance {
     var impedance: ComputableImpedance { get }
 }
 
 // MARK: - Passive components
 
-public final class Resistor: Bipole, LinearComponent {
+public final class Resistor: Bipole, ComponentWithComputableImpedance {
     
     public init(resistance: Measurement<UnitElectricResistance>, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.resistance = resistance
@@ -26,7 +26,7 @@ public final class Resistor: Bipole, LinearComponent {
     public var impedance: (Measurement<UnitFrequency>) -> Impedance
 }
 
-public final class Capacitor: Bipole, LinearComponent {
+public final class Capacitor: Bipole, ComponentWithComputableImpedance {
     public init(capacitance: Measurement<UnitCapacitance>, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.capacitance = capacitance
         self.impedance = { omega in
@@ -41,7 +41,7 @@ public final class Capacitor: Bipole, LinearComponent {
     public var impedance: (Measurement<UnitFrequency>) -> Impedance
 }
 
-public final class Inductor: Bipole, LinearComponent {
+public final class Inductor: Bipole, ComponentWithComputableImpedance {
     public init(inductance: Measurement<UnitInductance>, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.inductance = inductance
 

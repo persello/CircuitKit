@@ -3,8 +3,16 @@ import simd
 
 public class Circuit<Component: Bipole> {
     var nodes = Set<Node>()
+    var groundNode: Node?
     var components = Set<Component>()
-    // var voltagesources = ...
+
+    var voltageSources: [IdealVoltageGenerator] {
+        return components.filter({ $0 is IdealVoltageGenerator }).map({ $0 as! IdealVoltageGenerator })
+    }
+
+    var currentSources: [IdealCurrentGenerator] {
+        return components.filter({ $0 is IdealCurrentGenerator }).map({ $0 as! IdealCurrentGenerator })
+    }
 
     public func autoDiscover(startingNode: Node) {
         addNode(startingNode)
@@ -16,17 +24,18 @@ public class Circuit<Component: Bipole> {
                 autoDiscover(startingNode: otherSide)
             }
         }
+        
+        assert(groundNode != nil, "The specified circuit does not have a reference ground node. A ground node is necessary.")
     }
 
     internal func buildGMatrix(omega: Measurement<UnitFrequency>) -> Matrix<Complex?> {
         let g = Matrix<Complex?>()
 
-        for node1 in nodes.sorted(by: {$0.id.uuidString > $1.id.uuidString}).enumerated() {
-            for node2 in nodes.sorted(by: {$0.id.uuidString > $1.id.uuidString}).enumerated() {
+        for node1 in nodes.sorted(by: { $0.id.uuidString > $1.id.uuidString }).enumerated() {
+            for node2 in nodes.sorted(by: { $0.id.uuidString > $1.id.uuidString }).enumerated() {
                 g[node1.offset, node2.offset] = findComponentsBetween(node1.element, node2.element).reduce(Complex.zero, { result, component in
-
-                    if let linearComponent = component as? LinearComponent {
-                        return result + linearComponent.impedance(omega).asAdmittance().value
+                    if let component = component as? ComponentWithComputableImpedance {
+                        return result + component.impedance(omega).asAdmittance().value
                     }
 
                     return result
@@ -36,30 +45,30 @@ public class Circuit<Component: Bipole> {
 
         return g
     }
-    
-    internal func buildBMatrix() -> Matrix<Complex?> {
-        
-    }
-    
-    internal func buildCMatrix() -> Matrix<Complex?> {
-        // Transpose the B matrix since we have only independent voltage sources
-    }
-    
-    internal func buildDMatrix() -> Matrix<Complex?> {
-        // All zeros, since we have only independent voltage sources
-    }
-    
-    internal func buildAMatrix(omega: Measurement<UnitFrequency>) -> Matrix<Complex?> {
-        
-    }
-    
-    internal func buildZVector() -> Matrix<Complex?> {
-        
-    }
-    
-    internal func buildXVector() -> Matrix<Complex?> {
-        
-    }
+
+//    internal func buildBMatrix() -> Matrix<Complex?> {
+//        for 
+//    }
+//
+//    internal func buildCMatrix() -> Matrix<Complex?> {
+//        // Transpose the B matrix since we have only independent voltage sources
+//    }
+//
+//    internal func buildDMatrix() -> Matrix<Complex?> {
+//        // All zeros, since we have only independent voltage sources
+//    }
+//
+//    internal func buildAMatrix(omega: Measurement<UnitFrequency>) -> Matrix<Complex?> {
+//
+//    }
+//
+//    internal func buildZVector() -> Matrix<Complex?> {
+//
+//    }
+//
+//    internal func buildXVector() -> Matrix<Complex?> {
+//
+//    }
 
     func findComponentsBetween(_ a: Node, _ b: Node) -> [Component] {
         if a == b {
@@ -78,6 +87,16 @@ public class Circuit<Component: Bipole> {
     }
 
     func addNode(_ node: Node) {
-        nodes.insert(node)
+        // Set as reference node if ground
+        if node.isGroundReference {
+            // Merge all the ground nodes if necessary
+            if groundNode != nil {
+                groundNode = node + groundNode!
+            } else {
+                groundNode = node
+            }
+        } else {
+            nodes.insert(node)
+        }
     }
 }

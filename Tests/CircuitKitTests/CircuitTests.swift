@@ -23,7 +23,8 @@ final class CircuitTests: XCTestCase {
         let circuit = Circuit()
         circuit.autoDiscover(startingNode: d)
         
-        XCTAssertEqual(circuit.nodes.count, 4)
+        XCTAssertEqual(circuit.nodes.count, 3)
+        XCTAssertNotNil(circuit.groundNode)
         XCTAssertEqual(circuit.components.count, 8)
         
         print(circuit.buildGMatrix(omega: 0.hertz))
