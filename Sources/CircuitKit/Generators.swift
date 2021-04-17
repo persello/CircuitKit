@@ -4,19 +4,19 @@ protocol Generator {
     
 }
 
-class IdealVoltageGenerator: Bipole, Generator {
+public class IdealVoltageGenerator: Bipole, Generator {
     var fixedVoltage: Voltage
     
-    init(voltage: Voltage, positiveTerminal: Pin = .pinA, nodeA: Node? = nil, nodeB: Node? = nil) {
+    public init(voltage: Voltage, positiveTerminal: Pin = .pinA, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.fixedVoltage = (positiveTerminal == .pinA) ? voltage : -voltage
         super.init(nodeA: nodeA, nodeB: nodeB)
     }
 }
 
-class IdealCurrentGenerator: Bipole, Generator {
+public class IdealCurrentGenerator: Bipole, Generator {
     var fixedCurrent: Current
     
-    init(current: Current, positiveTerminal: Pin = .pinA, nodeA: Node? = nil, nodeB: Node? = nil) {
+    public init(current: Current, positiveTerminal: Pin = .pinA, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.fixedCurrent = (positiveTerminal == .pinA) ? current : -current
         super.init(nodeA: nodeA, nodeB: nodeB)
     }

@@ -1,8 +1,11 @@
 import Foundation
 
 public final class Node: Identifiable {
+    static var globalID: Int = 0
+    
     public init(_ name: String? = nil) {
-        id = UUID()
+        id = Node.globalID
+        Node.globalID += 1
         self.name = name
         connections = []
     }
@@ -10,7 +13,7 @@ public final class Node: Identifiable {
     public var name: String?
     public var voltage: Voltage?
     public var connections: [(Bipole, Bipole.Pin)]
-    public var id: UUID
+    public var id: Int
     public var isGroundReference = false
 
     static var ground: Node {
@@ -53,7 +56,7 @@ extension Node: Equatable {
 }
 
 extension Node: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+    public var hashValue: Int {
+        return ObjectIdentifier(self).hashValue
     }
 }

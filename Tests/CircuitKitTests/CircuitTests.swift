@@ -6,28 +6,23 @@ final class CircuitTests: XCTestCase {
     func testCircuit() {
         let a = Node("A")
         let b = Node("B")
-        let c = Node("C")
-        let d = Node.ground
+        let g = Node.ground
         
-        let c0 = Capacitor(capacitance: 0.0001.farads, between: a, and: b)
-        let r0 = Resistor(resistance: 10.ohms, between: a, and: c)
-        let l0 = Inductor(inductance: 0.1.henry, between: c, and: d)
-        let r1 = Resistor(resistance: 12.ohms, between: b, and: d)
+        let r1 = Resistor(resistance: 10.ohms, between: a, and: b)
+        let r2 = Resistor(resistance: 10.ohms, between: b, and: g)
         
-        let r2 = Resistor(resistance: 15.ohms, between: a, and: d)
-        let r3 = Resistor(resistance: 15.ohms, between: b, and: c)
-        
-        let r4 = Resistor(resistance: 15.ohms, between: a, and: b)
-        let r5 = Resistor(resistance: 15.ohms, between: a, and: c)
+        let e0 = IdealVoltageGenerator(voltage: Voltage(peak: 50.volts, phase: 0.degrees, omega: 0.hertz),
+                                       between: a, and: g)
         
         let circuit = Circuit()
-        circuit.autoDiscover(startingNode: d)
+        circuit.autoDiscover(startingNode: g)
+        circuit.solve()
         
-        XCTAssertEqual(circuit.nodes.count, 3)
-        XCTAssertNotNil(circuit.groundNode)
-        XCTAssertEqual(circuit.components.count, 8)
+        XCTAssertEqual(g.voltage?.value, .zero)
+        XCTAssertEqual(b.voltage?.value, e0.fixedVoltage.value/2)
         
-        print(circuit.buildGMatrix(omega: 0.hertz))
+        print(r1.voltage)
+        
     }
 
     static var allTests = [

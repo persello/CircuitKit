@@ -34,8 +34,7 @@ final class MatrixTests: XCTestCase {
         c[3, 2] = 6.3
 
         // Not setting D on purpose
-        let submatrices = Matrix<Matrix<Double?>>()
-        submatrices.content = [[a, b], [c]]
+        let submatrices = Matrix<Matrix<Double?>>() { [[a, b], [c]] }
 
         let x = Matrix<Double?>(fromMatrixOfMatrices: submatrices)
 
@@ -75,9 +74,9 @@ final class MatrixTests: XCTestCase {
             ]
         }
         
-        XCTAssertEqual(c.realMatrixRepresentation, result)
+        XCTAssertEqual(c.hermitianMatrix, result)
         
-        let y = Matrix<Complex?> (fromRealMatrixRepresentation: c.realMatrixRepresentation)
+        let y = Matrix<Complex?> (fromHermitianMatrix: c.hermitianMatrix)
         XCTAssertEqual(c, y)
     }
 

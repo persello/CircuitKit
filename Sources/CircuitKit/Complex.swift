@@ -196,7 +196,7 @@ public final class Complex: AdditiveArithmetic, CustomStringConvertible, Equatab
 
     // CustomStringConvertible
     public var description: String {
-        return "\(String(format: "%.2f", real)) + \(String(format: "%.2f", imaginary))j"
+        return "\(String(format: "%.2f", real))\(imaginary >= 0 ? "+" : "-")\(String(format: "%.2f", abs(imaginary)))j"
     }
 
     // MARK: - Constants

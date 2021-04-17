@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Accelerate
 
 // MARK: - Matrix
 
@@ -81,6 +82,18 @@ public final class Matrix<T>: CustomStringConvertible {
 
     // MARK: Public
 
+    public var transposed: Matrix<T> {
+        let result = Matrix<T>()
+        let (rows, cols) = self.size
+        for row in 0..<rows {
+            for col in 0..<cols {
+                result[col, row] = self[row, col]
+            }
+        }
+        
+        return result
+    }
+
     public var size: (Int, Int) {
         // (rows, cols)
         return (content.count, content.map({ $0.count }).max() ?? 0)
@@ -109,14 +122,14 @@ public final class Matrix<T>: CustomStringConvertible {
         for row in 0 ..< size.0 {
             for col in 0 ..< size.1 {
                 let item = self[row, col]
-                descMatrix[row][col] = String(describing: unwrap(any: item as Any))
+                descMatrix[row][col] = String(describing: unwrap(any: unwrap(any: item as Any)))
                 maxLen = max(maxLen, descMatrix[row][col].count)
             }
         }
 
         return descMatrix.map({ row in
             row.map({ item in
-                item.padding(toLength: maxLen, withPad: " ", startingAt: 0)
+                item.padding(toLength: maxLen + 1, withPad: " ", startingAt: 0)
             })
         })
             .reduce("", { res, item in
@@ -195,26 +208,34 @@ extension Matrix where T == Complex? {
 
         return result
     }
+    
+    public var hermitianColumnVector: Matrix<Double?> {
+        assert(size.1 == 1, "Not a column vector.")
+        
+        let submatrices = Matrix<Matrix<Double?>>()
+        submatrices.content = [[getRealPart()], [getImaginaryPart()]]
+        return Matrix<Double?>(fromMatrixOfMatrices: submatrices)
+    }
 
-    public var realMatrixRepresentation: Matrix<Double?> {
+    public var hermitianMatrix: Matrix<Double?> {
         let submatrices = Matrix<Matrix<Double?>>()
         submatrices.content = [[getRealPart(), -getImaginaryPart()], [getImaginaryPart(), getRealPart()]]
 
         return Matrix<Double?>(fromMatrixOfMatrices: submatrices)
     }
 
-    public convenience init(fromRealMatrixRepresentation realMatrix: Matrix<Double?>) {
-        assert(realMatrix.size.0.isMultiple(of: 2), "The supplied matrix has \(realMatrix.size.0) rows, which is odd.")
-        assert(realMatrix.size.1.isMultiple(of: 2), "The supplied matrix has \(realMatrix.size.1) columns, which is odd.")
+    public convenience init(fromHermitianMatrix h: Matrix<Double?>) {
+        assert(h.size.0.isMultiple(of: 2), "The supplied matrix has \(h.size.0) rows, which is odd.")
+        assert(h.size.1.isMultiple(of: 2), "The supplied matrix has \(h.size.1) columns, which is odd.")
 
         self.init()
-        let finalSize = (realMatrix.size.0 / 2, realMatrix.size.1 / 2)
+        let finalSize = (h.size.0 / 2, h.size.1 / 2)
         for row in 0 ..< finalSize.0 {
             for col in 0 ..< finalSize.1 {
                 // Check real parts are equal
-                assert(realMatrix[row, col] == realMatrix[row + finalSize.0, col + finalSize.1],
+                assert(h[row, col] == h[row + finalSize.0, col + finalSize.1],
                        """
-                       The specified real matrix is not a valid representation for a complex matrix.
+                       The specified real matrix is not a valid hermitian representation for a complex matrix.
                        The upper-left part and the bottom-right part are different.
                        Please supply a block matrix in this format:
 
@@ -229,27 +250,27 @@ extension Matrix where T == Complex? {
 
                 // Check complex parts are opposite
                 let complexPartErrorString = """
-                       The specified real matrix is not a valid representation for a complex matrix.
-                       The bottom-left part and the upper-right part are not opposite.
-                       Please supply a block matrix in this format:
+                The specified real matrix is not a valid hermitian representation for a complex matrix.
+                The bottom-left part and the upper-right part are not opposite.
+                Please supply a block matrix in this format:
 
-                                          |
-                                    Re(C) | -Im(C)
-                                   -------|--------
-                                    Im(C) |  Re(C)
-                                          |
+                                   |
+                             Re(C) | -Im(C)
+                            -------|--------
+                             Im(C) |  Re(C)
+                                   |
 
-                       Where C is the complex matrix you want to build.
-                       """
-                
-                if realMatrix[row + finalSize.0, col] == nil || realMatrix[row, col + finalSize.1] == nil {
-                    assert(realMatrix[row + finalSize.0, col] == realMatrix[row, col + finalSize.1], complexPartErrorString)
+                Where C is the complex matrix you want to build.
+                """
+
+                if h[row + finalSize.0, col] == nil || h[row, col + finalSize.1] == nil {
+                    assert(h[row + finalSize.0, col] == h[row, col + finalSize.1], complexPartErrorString)
                 } else {
-                    assert((realMatrix[row + finalSize.0, col])! == -(realMatrix[row, col + finalSize.1]!!), complexPartErrorString)
+                    assert((h[row + finalSize.0, col])! == -(h[row, col + finalSize.1]!!), complexPartErrorString)
                 }
 
-                let real: Double?? = realMatrix[row, col]
-                let imaginary: Double?? = realMatrix[row + finalSize.0, col]
+                let real: Double?? = h[row, col]
+                let imaginary: Double?? = h[row + finalSize.0, col]
 
                 if real == nil && imaginary == nil {
                     self[row, col] = nil
@@ -262,6 +283,43 @@ extension Matrix where T == Complex? {
 }
 
 extension Matrix where T == Optional<Double> {
+    
+    public var asSparseMatrix: SparseMatrix_Double {
+        
+        // Build the sparse matrix with coordinates
+        var rows: [Int32] = []
+        var columns: [Int32] = []
+        var values: [Double] = []
+        
+        for row in 0..<size.0 {
+            for col in 0..<size.1 {
+                if let val = self[row, col] {
+                    guard val != nil else { continue }
+                    rows.append(Int32(row))
+                    columns.append(Int32(col))
+                    values.append(val!)
+                }
+            }
+        }
+
+        var attributes = SparseAttributes_t()
+        attributes.kind = SparseOrdinary
+        
+        return SparseConvertFromCoordinate(Int32(size.0), Int32(size.1), values.count, UInt8(1), attributes, &rows, &columns, &values)
+    }
+    
+    public var asDoubleArray: [Double] {
+        var result: [Double] = []
+        let (rows, cols) = self.size
+        for col in 0..<cols {
+            for row in 0..<rows {
+                result.append((self[row, col] ?? 0) ?? 0)
+            }
+        }
+        
+        return result
+    }
+    
     public static prefix func - (_ rhs: Matrix<T>) -> Matrix<T> {
         let result = Matrix<T>()
         result.content = rhs.content.map({ row in

@@ -79,7 +79,9 @@ extension Sinusoidal {
 // CustomStringConvertible conformance
 extension Sinusoidal {
     public var description: String {
-        return "\(peak) peak @ \(omega.converted(to: .hertz)) with \(phase.converted(to: .degrees)) phase"
+        let formatter = MeasurementFormatter()
+        formatter.numberFormatter.maximumFractionDigits = 3
+        return "\(formatter.string(from: peak)) peak @ \(formatter.string(from: omega.converted(to: .hertz))) with \(formatter.string(from: phase.converted(to: .degrees))) phase"
     }
 }
 
