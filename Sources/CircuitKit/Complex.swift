@@ -196,7 +196,7 @@ public final class Complex: AdditiveArithmetic, CustomStringConvertible, Equatab
 
     // CustomStringConvertible
     public var description: String {
-        return "\(String(format: "%.2f", real))\(imaginary >= 0 ? "+" : "-")\(String(format: "%.2f", abs(imaginary)))j"
+        return "\(String(format: "%.4f", real))\(imaginary >= 0 ? "+" : "-")\(String(format: "%.4f", abs(imaginary)))j"
     }
 
     // MARK: - Constants
@@ -205,7 +205,6 @@ public final class Complex: AdditiveArithmetic, CustomStringConvertible, Equatab
     public static let zero = Complex(real: 0, imaginary: 0)
     
     // MARK: - Expressible by literal conformance
-    
     public convenience init(integerLiteral value: Int) {
         self.init(real: Double(value), imaginary: 0)
     }

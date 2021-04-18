@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Extension for existing frequency unit
 extension UnitFrequency {
-    public static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 2 * .pi))
+    public static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 1 / (2 * .pi)))
 }
 
 // MARK: - Inductance and capacitance
