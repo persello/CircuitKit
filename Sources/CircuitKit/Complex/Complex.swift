@@ -213,25 +213,3 @@ public final class Complex: AdditiveArithmetic, CustomStringConvertible, Equatab
         self.init(real: value, imaginary: 0)
     }
 }
-
-
-// MARK: - Other types extensions
-infix operator ≈≈: ComparisonPrecedence
-
-extension Double {
-    static let approximationPrecision = 0.00000000001
-    
-    public var j: Complex {
-        return Complex(real: 0, imaginary: self)
-    }
-    
-    public static func ≈≈ (_ lhs: Double, _ rhs: Double) -> Bool {
-        return abs(lhs - rhs) < approximationPrecision
-    }
-}
-
-extension Int {
-    public var j: Complex {
-        return Complex(real: 0, imaginary: Double(self))
-    }
-}

@@ -9,6 +9,26 @@ protocol ComponentWithComputableImpedance {
     var impedance: ComputableImpedance { get }
 }
 
+// MARK: - Operations with computable impedance
+// V = I * Z
+// V = Z * I
+extension Current {
+    public static func * (_ lhs: Current, _ rhs: ComputableImpedance) -> Voltage {
+        return lhs * rhs(lhs.omega)
+    }
+
+    public static func * (_ lhs: ComputableImpedance, _ rhs: Current) -> Voltage {
+        return rhs * lhs
+    }
+}
+
+// I = V / Z
+extension Voltage {
+    public static func / (_ lhs: Voltage, _ rhs: ComputableImpedance) -> Current {
+        lhs / rhs(lhs.omega)
+    }
+}
+
 // MARK: - Passive components
 
 public final class Resistor: Bipole, ComponentWithComputableImpedance {
@@ -55,24 +75,4 @@ public final class Inductor: Bipole, ComponentWithComputableImpedance {
 
     public var inductance: Measurement<UnitInductance>
     public var impedance: (Measurement<UnitFrequency>) -> Impedance
-}
-
-// MARK: - Operations with computable impedance
-// V = I * Z
-// V = Z * I
-extension Current {
-    public static func * (_ lhs: Current, _ rhs: ComputableImpedance) -> Voltage {
-        return lhs * rhs(lhs.omega)
-    }
-
-    public static func * (_ lhs: ComputableImpedance, _ rhs: Current) -> Voltage {
-        return rhs * lhs
-    }
-}
-
-// I = V / Z
-extension Voltage {
-    public static func / (_ lhs: Voltage, _ rhs: ComputableImpedance) -> Current {
-        lhs / rhs(lhs.omega)
-    }
 }

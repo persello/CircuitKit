@@ -1,12 +1,6 @@
 import Accelerate
 import Foundation
 
-extension SparseMatrix_Double: CustomStringConvertible {
-    public var description: String {
-        return String(describing: self.data)
-    }
-}
-
 public class Solver {
     public static func solveSystem(coefficientMatrix a: Matrix<Complex?>, constantsVector b: Matrix<Complex?>) -> [Double] {
         let matrixSize = a.size

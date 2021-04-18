@@ -8,8 +8,9 @@ final class CircuitTests: XCTestCase {
         let b = Node("B")
         let g = Node.ground
         
-        let r1 = Resistor(resistance: 10.ohms, between: a, and: b)
-        let r2 = Resistor(resistance: 10.ohms, between: b, and: g)
+        // R1 and R2
+        _ = Resistor(resistance: 10.ohms, between: a, and: b)
+        _ = Resistor(resistance: 10.ohms, between: b, and: g)
         
         let e0 = IdealVoltageGenerator(voltage: Voltage(peak: 50.volts, phase: 0.degrees, omega: 0.hertz),
                                        between: a, and: g)
@@ -49,8 +50,9 @@ final class CircuitTests: XCTestCase {
         let c2 = Capacitor(capacitance: 0.05e-6.farads, between: a, and: g)
         let c3 = Capacitor(capacitance: 0.22e-6.farads, between: a, and: g)
         
+        // R1 and R2
         let r1 = Resistor(resistance: 330.ohms, between: a)
-        let r2 = Resistor(resistance: 180.ohms, between: r1.nodeB, and: g)
+        _ = Resistor(resistance: 180.ohms, between: r1.nodeB, and: g)
 
         let circuit = Circuit()
         circuit.autoDiscover(startingNode: g)
