@@ -40,7 +40,7 @@ public class Circuit {
 
                     return result
                 })
-                
+
                 // Invert everything outside diagonal
                 g[node1.offset, node2.offset] = ((g[node1.offset, node2.offset] ?? 0) ?? 0) * Double((node1.offset == node2.offset) ? 1 : -1)
             }
@@ -127,7 +127,7 @@ public class Circuit {
         assert(solutionArray.count.isMultiple(of: 2), "The solution does not represent a complex array")
 
         var solution = [Complex](repeating: .zero, count: solutionArray.count / 2)
-        for index in 0..<solution.count {
+        for index in 0 ..< solution.count {
             solution[index] = Complex(real: solutionArray[index], imaginary: solutionArray[index + solution.count])
         }
 
@@ -137,6 +137,13 @@ public class Circuit {
 
         for generator in voltageSources.sorted(by: { $0.id > $1.id }).enumerated() {
             generator.element.current = Current(omega: omega, value: solution[nodes.count + generator.offset])
+        }
+
+        for component in components.filter({ $0 is ComponentWithComputableImpedance }) {
+            let impedance = (component as! ComponentWithComputableImpedance).impedance(omega)
+            if let voltage = component.voltage {
+                component.current = voltage / impedance
+            }
         }
     }
 
@@ -148,7 +155,7 @@ public class Circuit {
                 let otherSide: Node = (connection.1 == .pinA) ? connection.0.nodeB : connection.0.nodeA
                 return otherSide == b
             })
-            .map({ $0.0 })
+                .map({ $0.0 })
         }
     }
 
