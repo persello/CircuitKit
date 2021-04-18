@@ -4,6 +4,10 @@ public class Circuit {
     var nodes = Set<Node>()
     var groundNode: Node?
     var components = Set<Bipole>()
+    
+    public init(autoDiscoverFromNode node: Node) {
+        autoDiscover(startingNode: node)
+    }
 
     var voltageSources: [IdealVoltageGenerator] {
         return components.filter({ $0 is IdealVoltageGenerator }).map({ $0 as! IdealVoltageGenerator })
@@ -147,7 +151,7 @@ public class Circuit {
         }
     }
 
-    func findComponentsBetween(_ a: Node, _ b: Node) -> [Bipole] {
+    internal func findComponentsBetween(_ a: Node, _ b: Node) -> [Bipole] {
         if a == b {
             return a.connections.map({ $0.0 })
         } else {
@@ -159,11 +163,11 @@ public class Circuit {
         }
     }
 
-    func addComponent(_ component: Bipole) {
+    internal func addComponent(_ component: Bipole) {
         components.insert(component)
     }
 
-    func addNode(_ node: Node) {
+    internal func addNode(_ node: Node) {
         // Set as reference node if ground
         if node.isGroundReference {
             // Merge all the ground nodes if necessary

@@ -5,7 +5,7 @@ protocol Generator {
 }
 
 public class IdealVoltageGenerator: Bipole, Generator {
-    var fixedVoltage: Voltage
+    public var fixedVoltage: Voltage
     
     public init(voltage: Voltage, positiveTerminal: Pin = .pinA, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.fixedVoltage = (positiveTerminal == .pinA) ? voltage : -voltage
@@ -14,7 +14,7 @@ public class IdealVoltageGenerator: Bipole, Generator {
 }
 
 public class IdealCurrentGenerator: Bipole, Generator {
-    var fixedCurrent: Current
+    public var fixedCurrent: Current
     
     public init(current: Current, positiveTerminal: Pin = .pinA, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.fixedCurrent = (positiveTerminal == .pinA) ? current : -current

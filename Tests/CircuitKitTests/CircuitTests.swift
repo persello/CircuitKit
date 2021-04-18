@@ -15,8 +15,7 @@ final class CircuitTests: XCTestCase {
         let e0 = IdealVoltageGenerator(voltage: Voltage(peak: 50.volts, phase: 0.degrees, omega: 0.hertz),
                                        between: a, and: g)
         
-        let circuit = Circuit()
-        circuit.autoDiscover(startingNode: g)
+        let circuit = Circuit(autoDiscoverFromNode: g)
         circuit.solve()
         
         XCTAssertEqual(g.voltage?.value, .zero)
@@ -33,9 +32,8 @@ final class CircuitTests: XCTestCase {
         
         let e = IdealVoltageGenerator(voltage: Voltage(peak: 5.volts, phase: 0.degrees, omega: 1000.hertz), between: b, and: g)
         
-        let circuit = Circuit()
-        circuit.autoDiscover(startingNode: g)
-        circuit.solve()
+        let circuit = Circuit(autoDiscoverFromNode: g)
+
         
         XCTAssertEqual(r1.voltage?.value, e.fixedVoltage.value / (c.impedance(1000.hertz).value + r1.impedance(1000.hertz).value) * r1.impedance(1000.hertz).value)
     }
@@ -54,9 +52,7 @@ final class CircuitTests: XCTestCase {
         let r1 = Resistor(resistance: 330.ohms, between: a)
         _ = Resistor(resistance: 180.ohms, between: r1.nodeB, and: g)
 
-        let circuit = Circuit()
-        circuit.autoDiscover(startingNode: g)
-        circuit.solve()
+        let circuit = Circuit(autoDiscoverFromNode: g)
         
         // Tolerance is 6.2 due to potential rounding in exercises
         XCTAssertEqual((e.current?.rms.converted(to: .milliamperes).value)!, 82.7, accuracy: 0.2)

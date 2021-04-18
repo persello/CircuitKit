@@ -16,7 +16,7 @@ public final class Node: Identifiable {
     public var id: Int
     public var isGroundReference = false
 
-    static var ground: Node {
+    public static var ground: Node {
         let node = Node("GND")
         node.voltage = Voltage(peak: 0.volts, phase: 0.radians, omega: 0.radiansPerSecond)
         node.isGroundReference = true
