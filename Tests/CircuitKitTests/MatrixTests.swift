@@ -57,8 +57,8 @@ final class MatrixTests: XCTestCase {
     func testComplexToReal() {
         let c = Matrix<Complex?>() {
             [
-                [2.j + 4, 3.j, nil],
-                [2.j, 6, -1.j - 3],
+                [2.j + 4.0, 3.j, nil],
+                [2.j, 6.0, -1.j - 3.0],
                 [0, nil, 0],
             ]
         }
